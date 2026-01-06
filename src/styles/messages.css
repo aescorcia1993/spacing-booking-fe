@@ -1,0 +1,281 @@
+/* ============================================
+   MESSAGE/ALERT GLOBAL STYLES
+   ============================================ */
+
+/* Base Message */
+.p-message {
+  background: white !important;
+  border: 1px solid !important;
+  border-radius: 8px !important;
+  padding: 0.75rem 1rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  margin: 0.5rem 0 !important;
+}
+
+.p-message-wrapper {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  width: 100% !important;
+}
+
+.p-message-icon {
+  font-size: 1.25rem !important;
+  flex-shrink: 0 !important;
+}
+
+.p-message-text {
+  font-size: 0.8125rem !important;
+  line-height: 1.5 !important;
+  flex: 1 !important;
+}
+
+.p-message-close {
+  margin-left: auto !important;
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+  padding: 0.25rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 4px !important;
+  transition: all 0.3s ease !important;
+}
+
+/* Success Message */
+.p-message-success {
+  background: #f0fdf4 !important;
+  border-color: #10b981 !important;
+  color: #065f46 !important;
+}
+
+.p-message-success .p-message-icon {
+  color: #10b981 !important;
+}
+
+.p-message-success .p-message-close:hover {
+  background: rgba(16, 185, 129, 0.1) !important;
+  color: #065f46 !important;
+}
+
+/* Info Message */
+.p-message-info {
+  background: #eff6ff !important;
+  border-color: #3b82f6 !important;
+  color: #1e40af !important;
+}
+
+.p-message-info .p-message-icon {
+  color: #3b82f6 !important;
+}
+
+.p-message-info .p-message-close:hover {
+  background: rgba(59, 130, 246, 0.1) !important;
+  color: #1e40af !important;
+}
+
+/* Warning Message */
+.p-message-warn {
+  background: #fffbeb !important;
+  border-color: #f59e0b !important;
+  color: #92400e !important;
+}
+
+.p-message-warn .p-message-icon {
+  color: #f59e0b !important;
+}
+
+.p-message-warn .p-message-close:hover {
+  background: rgba(245, 158, 11, 0.1) !important;
+  color: #92400e !important;
+}
+
+/* Error Message */
+.p-message-error {
+  background: #fef2f2 !important;
+  border-color: #ef4444 !important;
+  color: #991b1b !important;
+}
+
+.p-message-error .p-message-icon {
+  color: #ef4444 !important;
+}
+
+.p-message-error .p-message-close:hover {
+  background: rgba(239, 68, 68, 0.1) !important;
+  color: #991b1b !important;
+}
+
+/* Toast Messages */
+.p-toast {
+  z-index: 10000 !important;
+}
+
+.p-toast-message {
+  background: white !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+  border-left: 4px solid !important;
+  padding: 1rem !important;
+  margin: 0.5rem 0 !important;
+}
+
+.p-toast-message-content {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+}
+
+.p-toast-message-icon {
+  font-size: 1.5rem !important;
+  flex-shrink: 0 !important;
+}
+
+.p-toast-message-text {
+  flex: 1 !important;
+}
+
+.p-toast-summary {
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.p-toast-detail {
+  font-size: 0.8125rem !important;
+  line-height: 1.5 !important;
+  color: #6c757d !important;
+}
+
+.p-toast-icon-close {
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+  padding: 0.25rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 4px !important;
+  transition: all 0.3s ease !important;
+  margin-left: 0.5rem !important;
+}
+
+/* Toast Success */
+.p-toast-message-success {
+  border-left-color: #10b981 !important;
+}
+
+.p-toast-message-success .p-toast-message-icon {
+  color: #10b981 !important;
+}
+
+.p-toast-message-success .p-toast-icon-close:hover {
+  background: rgba(16, 185, 129, 0.1) !important;
+}
+
+/* Toast Info */
+.p-toast-message-info {
+  border-left-color: #3b82f6 !important;
+}
+
+.p-toast-message-info .p-toast-message-icon {
+  color: #3b82f6 !important;
+}
+
+.p-toast-message-info .p-toast-icon-close:hover {
+  background: rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Toast Warning */
+.p-toast-message-warn {
+  border-left-color: #f59e0b !important;
+}
+
+.p-toast-message-warn .p-toast-message-icon {
+  color: #f59e0b !important;
+}
+
+.p-toast-message-warn .p-toast-icon-close:hover {
+  background: rgba(245, 158, 11, 0.1) !important;
+}
+
+/* Toast Error */
+.p-toast-message-error {
+  border-left-color: #ef4444 !important;
+}
+
+.p-toast-message-error .p-toast-message-icon {
+  color: #ef4444 !important;
+}
+
+.p-toast-message-error .p-toast-icon-close:hover {
+  background: rgba(239, 68, 68, 0.1) !important;
+}
+
+/* Inline Messages */
+.p-inline-message {
+  background: white !important;
+  border: 1px solid !important;
+  border-radius: 6px !important;
+  padding: 0.5rem 0.75rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  font-size: 0.8125rem !important;
+}
+
+.p-inline-message-icon {
+  font-size: 1rem !important;
+}
+
+.p-inline-message-text {
+  font-size: 0.8125rem !important;
+}
+
+/* Inline Success */
+.p-inline-message-success {
+  background: #f0fdf4 !important;
+  border-color: #10b981 !important;
+  color: #065f46 !important;
+}
+
+.p-inline-message-success .p-inline-message-icon {
+  color: #10b981 !important;
+}
+
+/* Inline Info */
+.p-inline-message-info {
+  background: #eff6ff !important;
+  border-color: #3b82f6 !important;
+  color: #1e40af !important;
+}
+
+.p-inline-message-info .p-inline-message-icon {
+  color: #3b82f6 !important;
+}
+
+/* Inline Warning */
+.p-inline-message-warn {
+  background: #fffbeb !important;
+  border-color: #f59e0b !important;
+  color: #92400e !important;
+}
+
+.p-inline-message-warn .p-inline-message-icon {
+  color: #f59e0b !important;
+}
+
+/* Inline Error */
+.p-inline-message-error {
+  background: #fef2f2 !important;
+  border-color: #ef4444 !important;
+  color: #991b1b !important;
+}
+
+.p-inline-message-error .p-inline-message-icon {
+  color: #ef4444 !important;
+}

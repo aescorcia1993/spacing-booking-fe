@@ -1,0 +1,164 @@
+/* ============================================
+   FORM CONTROLS GLOBAL STYLES
+   ============================================ */
+
+/* Text Inputs */
+.p-inputtext,
+.p-input,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+textarea {
+  background: white !important;
+  border: 1px solid #ced4da !important;
+  border-radius: 6px !important;
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.8125rem !important;
+  height: 2.5rem !important;
+  line-height: 1.5 !important;
+  color: #495057 !important;
+  transition: all 0.3s ease !important;
+  width: 100%;
+}
+
+textarea {
+  height: auto !important;
+  min-height: 4rem !important;
+  resize: vertical !important;
+}
+
+.p-inputtext:hover,
+.p-input:hover,
+input[type="text"]:hover,
+input[type="email"]:hover,
+input[type="password"]:hover,
+input[type="search"]:hover,
+textarea:hover {
+  border-color: #74ACDF !important;
+}
+
+.p-inputtext:focus,
+.p-input:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="search"]:focus,
+textarea:focus {
+  outline: none !important;
+  border-color: #74ACDF !important;
+  box-shadow: 0 0 0 0.2rem rgba(116, 172, 223, 0.25) !important;
+}
+
+.p-inputtext::placeholder,
+.p-input::placeholder,
+input::placeholder,
+textarea::placeholder {
+  color: #adb5bd !important;
+  opacity: 1 !important;
+}
+
+/* Input Number */
+.p-inputnumber {
+  width: 100%;
+}
+
+.p-inputnumber .p-inputtext {
+  text-align: left !important;
+  padding-right: 2.5rem !important;
+}
+
+.p-inputnumber-buttons-stacked .p-button {
+  background: white !important;
+  border: 1px solid #ced4da !important;
+  color: #6c757d !important;
+  height: 1.25rem !important;
+  width: 2rem !important;
+}
+
+.p-inputnumber-buttons-stacked .p-button:hover {
+  background: #f8f9fa !important;
+  color: #0033A0 !important;
+  border-color: #74ACDF !important;
+}
+
+.p-inputnumber-buttons-stacked .p-button:active {
+  background: #e9ecef !important;
+}
+
+.p-inputnumber-buttons-stacked .p-inputnumber-button-group {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+}
+
+.p-inputnumber-buttons-stacked .p-inputnumber-button-up {
+  border-top-right-radius: 6px !important;
+  border-bottom: none !important;
+}
+
+.p-inputnumber-buttons-stacked .p-inputnumber-button-down {
+  border-bottom-right-radius: 6px !important;
+  border-top: none !important;
+}
+
+/* Input Group */
+.p-inputgroup {
+  display: flex;
+  align-items: stretch;
+}
+
+.p-inputgroup .p-inputtext {
+  flex: 1;
+}
+
+.p-inputgroup-addon {
+  background: #f8f9fa !important;
+  border: 1px solid #ced4da !important;
+  padding: 0.5rem 0.75rem !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6c757d !important;
+}
+
+.p-inputgroup-addon:first-child {
+  border-right: none !important;
+  border-top-left-radius: 6px !important;
+  border-bottom-left-radius: 6px !important;
+}
+
+.p-inputgroup-addon:last-child {
+  border-left: none !important;
+  border-top-right-radius: 6px !important;
+  border-bottom-right-radius: 6px !important;
+}
+
+/* Invalid State */
+.p-inputtext.ng-invalid.ng-touched,
+.p-input.ng-invalid.ng-touched,
+input.ng-invalid.ng-touched,
+textarea.ng-invalid.ng-touched {
+  border-color: #ef4444 !important;
+}
+
+.p-inputtext.ng-invalid.ng-touched:focus,
+.p-input.ng-invalid.ng-touched:focus,
+input.ng-invalid.ng-touched:focus,
+textarea.ng-invalid.ng-touched:focus {
+  box-shadow: 0 0 0 0.2rem rgba(239, 68, 68, 0.25) !important;
+}
+
+/* Disabled State */
+.p-inputtext:disabled,
+.p-input:disabled,
+input:disabled,
+textarea:disabled {
+  background: #f8f9fa !important;
+  color: #6c757d !important;
+  cursor: not-allowed !important;
+  opacity: 0.7 !important;
+}

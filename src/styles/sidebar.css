@@ -1,0 +1,270 @@
+/* ============================================
+   SIDEBAR/OVERLAY MENU GLOBAL STYLES
+   ============================================ */
+
+/* Sidebar Container (used by PrimeNG Menubar on mobile) */
+.p-sidebar,
+.p-menubar-mobile {
+  background: white !important;
+  border: none !important;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15) !important;
+  padding: 0 !important;
+}
+
+.p-sidebar-header {
+  background: linear-gradient(135deg, #74ACDF 0%, #5B9BD5 50%, #0033A0 100%) !important;
+  padding: 1.5rem 1rem !important;
+  border-bottom: none !important;
+}
+
+.p-sidebar-header .p-sidebar-title {
+  color: white !important;
+  font-weight: 600 !important;
+  font-size: 1.125rem !important;
+}
+
+.p-sidebar-header .p-sidebar-close {
+  color: white !important;
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+  border-radius: 50% !important;
+  transition: all 0.3s ease !important;
+}
+
+.p-sidebar-header .p-sidebar-close:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  transform: rotate(90deg) !important;
+}
+
+.p-sidebar-content {
+  background: white !important;
+  padding: 1rem !important;
+}
+
+/* Mobile Menubar Overlay */
+:host ::ng-deep .p-menubar-mobile-active .p-menubar-root-list {
+  position: absolute !important;
+  top: 100% !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: auto !important;
+  max-width: 320px !important;
+  height: auto !important;
+  background: white !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+  padding: 0.75rem !important;
+  border-radius: 12px !important;
+  border: 1px solid #e5e7eb !important;
+  margin: 0.5rem 1rem !important;
+  z-index: 9999 !important;
+}
+
+.p-menubar-root-list {
+  background: white !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12) !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  padding: 0.75rem !important;
+  margin-top: 0.5rem !important;
+}
+
+/* Mobile Menu Items */
+.p-menubar-mobile-active .p-menuitem {
+  margin-bottom: 0.125rem !important;
+}
+
+.p-menubar-mobile-active .p-menuitem-link {
+  background: white !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 0.875rem 1rem !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.875rem !important;
+  border-left: 3px solid transparent !important;
+  position: relative !important;
+}
+
+.p-menubar-mobile-active .p-menuitem-link::before {
+  content: '' !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  width: 0 !important;
+  background: linear-gradient(90deg, #74ACDF 0%, rgba(116, 172, 223, 0.1) 100%) !important;
+  transition: width 0.3s ease !important;
+  border-radius: 8px 0 0 8px !important;
+}
+
+.p-menubar-mobile-active .p-menuitem-link:hover::before {
+  width: 100% !important;
+}
+
+.p-menubar-mobile-active .p-menuitem-link:hover {
+  border-left-color: #74ACDF !important;
+  border-left-width: 4px !important;
+  transform: translateX(2px) !important;
+  box-shadow: 0 2px 8px rgba(116, 172, 223, 0.2) !important;
+}
+
+.p-menubar-mobile-active .p-menuitem-link .p-menuitem-icon {
+  color: #74ACDF !important;
+  font-size: 1.25rem !important;
+  min-width: 1.25rem !important;
+  transition: all 0.3s ease !important;
+  z-index: 1 !important;
+  position: relative !important;
+}
+
+.p-menubar-mobile-active .p-menuitem-link:hover .p-menuitem-icon {
+  color: #0033A0 !important;
+  transform: scale(1.2) !important;
+}
+
+.p-menubar-mobile-active .p-menuitem-link .p-menuitem-text {
+  color: #2c3e50 !important;
+  font-weight: 600 !important;
+  font-size: 0.9375rem !important;
+  transition: all 0.2s ease !important;
+  z-index: 1 !important;
+  position: relative !important;
+}
+
+.p-menubar-mobile-active .p-menuitem-link:hover .p-menuitem-text {
+  color: #0033A0 !important;
+  font-weight: 700 !important;
+}
+
+/* Active Menu Item in Mobile */
+.p-menubar-mobile-active .p-menuitem-link.router-link-active,
+.p-menubar-mobile-active .p-menuitem-link[aria-current="page"] {
+  background: linear-gradient(90deg, #74ACDF 0%, rgba(116, 172, 223, 0.3) 100%) !important;
+  border-left-color: #0033A0 !important;
+  border-left-width: 5px !important;
+  box-shadow: 0 4px 12px rgba(0, 51, 160, 0.25) !important;
+  transform: translateX(3px) !important;
+}
+
+.p-menubar-mobile-active .p-menuitem-link.router-link-active::before,
+.p-menubar-mobile-active .p-menuitem-link[aria-current="page"]::before {
+  width: 100% !important;
+  background: linear-gradient(90deg, rgba(0, 51, 160, 0.15) 0%, rgba(116, 172, 223, 0.05) 100%) !important;
+}
+
+.p-menubar-mobile-active .p-menuitem-link.router-link-active .p-menuitem-icon,
+.p-menubar-mobile-active .p-menuitem-link[aria-current="page"] .p-menuitem-icon {
+  color: #0033A0 !important;
+  font-weight: bold !important;
+  transform: scale(1.15) !important;
+  animation: pulse 2s ease-in-out infinite !important;
+}
+
+.p-menubar-mobile-active .p-menuitem-link.router-link-active .p-menuitem-text,
+.p-menubar-mobile-active .p-menuitem-link[aria-current="page"] .p-menuitem-text {
+  color: #0033A0 !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.3px !important;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Submenu in Mobile */
+.p-menubar-mobile-active .p-submenu-list {
+  background: #f8f9fa !important;
+  border-radius: 8px !important;
+  padding: 0.5rem !important;
+  margin-top: 0.5rem !important;
+  margin-left: 1rem !important;
+  border-left: 3px solid #74ACDF !important;
+}
+
+.p-menubar-mobile-active .p-submenu-list .p-menuitem-link {
+  background: white !important;
+  padding: 0.75rem 1rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
+/* Mobile Menu Toggle Button */
+.p-menubar-button {
+  background: transparent !important;
+  border: 1px solid #e0e0e0 !important;
+  color: #495057 !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+}
+
+.p-menubar-button:hover {
+  background: linear-gradient(135deg, rgba(116, 172, 223, 0.1) 0%, rgba(0, 51, 160, 0.1) 100%) !important;
+  border-color: #74ACDF !important;
+  color: #0033A0 !important;
+}
+
+.p-menubar-button:focus {
+  box-shadow: 0 0 0 0.2rem rgba(116, 172, 223, 0.25) !important;
+}
+
+/* Overlay Mask */
+.p-component-overlay,
+.p-sidebar-mask {
+  background: rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(2px) !important;
+}
+
+/* Drawer/Sidebar Animation */
+.p-sidebar-left {
+  animation: slideInLeft 0.3s ease-out !important;
+}
+
+.p-sidebar-right {
+  animation: slideInRight 0.3s ease-out !important;
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Menu Divider */
+.p-menu-separator {
+  border-top: 1px solid #e0e0e0 !important;
+  margin: 0.5rem 0 !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 960px) {
+  .p-menubar-mobile-active .p-menubar-root-list {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 280px !important;
+    height: 100vh !important;
+    overflow-y: auto !important;
+    z-index: 1100 !important;
+  }
+}

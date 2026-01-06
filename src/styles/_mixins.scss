@@ -1,0 +1,289 @@
+// ========================================
+// MIXINS ADICIONALES
+// ========================================
+
+@import 'variables';
+
+// Animación de entrada (fade in + slide up)
+@mixin fade-in-up($duration: $transition-normal) {
+  animation: fadeInUp $duration ease-out;
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+// Efecto de glass/glassmorphism
+@mixin glass-effect($blur: 10px, $opacity: 0.8) {
+  background: rgba(255, 255, 255, $opacity);
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+// Badge estilo argentino
+@mixin badge-argentina {
+  display: inline-flex;
+  align-items: center;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  @include gradient-argentina;
+}
+
+// Input con foco argentino
+@mixin input-focus {
+  outline: none;
+  border-color: $celeste;
+  box-shadow: 0 0 0 3px rgba($celeste, 0.2);
+  transition: all $transition-fast;
+}
+
+// Loading spinner argentino
+@mixin spinner-argentina($size: 40px) {
+  width: $size;
+  height: $size;
+  border: 3px solid $background-light;
+  border-top-color: $celeste;
+  border-radius: $radius-round;
+  animation: spin 0.8s linear infinite;
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+}
+
+// Card hover effect
+@mixin card-hover {
+  transition: all $transition-normal;
+  cursor: pointer;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
+  }
+}
+
+// Grid responsive automático
+@mixin auto-grid($min-column-width: 250px, $gap: $spacing-md) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax($min-column-width, 1fr));
+  gap: $gap;
+}
+
+// Overlay oscuro
+@mixin overlay($opacity: 0.5) {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, $opacity);
+  z-index: $z-modal-backdrop;
+}
+
+// Reset de lista
+@mixin list-reset {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+// Aspect ratio box
+@mixin aspect-ratio($width, $height) {
+  position: relative;
+  
+  &::before {
+    content: '';
+    display: block;
+    padding-top: calc(($height / $width) * 100%);
+  }
+  
+  > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// Botón primario argentino
+@mixin btn-primary {
+  padding: $spacing-sm $spacing-lg;
+  border: none;
+  border-radius: $radius-md;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  @include gradient-argentina;
+  @include button-hover($celeste);
+}
+
+// Botón secundario
+@mixin btn-secondary {
+  padding: $spacing-sm $spacing-lg;
+  border: 2px solid $celeste;
+  background: transparent;
+  color: $celeste;
+  border-radius: $radius-md;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: all $transition-normal;
+  
+  &:hover {
+    background: $celeste;
+    color: $blanco;
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+  }
+}
+
+// Card container estándar
+@mixin card-container {
+  @include card-shadow;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-lg;
+}
+
+// Header con gradiente
+@mixin header-gradient {
+  @include gradient-argentina;
+  padding: $spacing-lg $spacing-xl;
+  color: $text-white;
+  border-radius: $radius-lg $radius-lg 0 0;
+}
+
+// Separator line
+@mixin separator-line {
+  width: 100%;
+  height: 2px;
+  background: $gradient-argentina;
+  margin: $spacing-lg 0;
+}
+
+// Tag/Badge de estado
+@mixin status-badge($color) {
+  display: inline-block;
+  padding: $spacing-xs $spacing-sm;
+  background: lighten($color, 40%);
+  color: darken($color, 10%);
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  text-transform: uppercase;
+}
+
+// Pulse animation
+@mixin pulse-animation($color: $celeste) {
+  animation: pulse 2s infinite;
+  
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba($color, 0.7);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba($color, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba($color, 0);
+    }
+  }
+}
+
+// Skeleton loading
+@mixin skeleton-loading {
+  background: linear-gradient(
+    90deg,
+    $background-light 0%,
+    $background-dark 50%,
+    $background-light 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton 1.5s infinite;
+  
+  @keyframes skeleton {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+}
+
+// Form control base
+@mixin form-control {
+  width: 100%;
+  padding: $spacing-sm $spacing-md;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  font-size: $font-size-md;
+  transition: all $transition-fast;
+  
+  &:focus {
+    @include input-focus;
+  }
+  
+  &:disabled {
+    background: $background-light;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+// Tooltip argentino
+@mixin tooltip($position: top) {
+  position: relative;
+  
+  &::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    background: $azul-oscuro;
+    color: $blanco;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $radius-sm;
+    font-size: $font-size-xs;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity $transition-fast;
+    z-index: $z-tooltip;
+    
+    @if $position == top {
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-bottom: $spacing-xs;
+    }
+    @else if $position == bottom {
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-top: $spacing-xs;
+    }
+    @else if $position == left {
+      right: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+      margin-right: $spacing-xs;
+    }
+    @else if $position == right {
+      left: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+      margin-left: $spacing-xs;
+    }
+  }
+  
+  &:hover::after {
+    opacity: 1;
+  }
+}
