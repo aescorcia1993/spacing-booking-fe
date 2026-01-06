@@ -511,7 +511,9 @@ npm run format     # Formatear código
 
 ## 📄 Licencia
 
-Este proyecto es privado y confidencial.
+Copyright (c) 2026 SpaceBooking. All Rights Reserved.
+
+Este proyecto es **propietario y confidencial**. Todos los derechos reservados.
 
 ---
 
