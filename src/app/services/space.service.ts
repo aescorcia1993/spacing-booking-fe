@@ -23,7 +23,7 @@ export class SpaceService {
     page?: number;
   }): Observable<PaginatedResponse<Space>> {
     let params = new HttpParams();
-    
+
     if (filters?.search) {
       params = params.append('search', filters.search);
     }
@@ -46,10 +46,13 @@ export class SpaceService {
   /**
    * Get all spaces (admin only)
    */
-  getAllSpaces(page?: number, sortField?: string, sortOrder?: string): Observable<PaginatedResponse<Space>> {
+  getAllSpaces(page?: number, perPage?: number, sortField?: string, sortOrder?: string): Observable<PaginatedResponse<Space>> {
     let params = new HttpParams();
     if (page) {
       params = params.append('page', page.toString());
+    }
+    if (perPage) {
+      params = params.append('per_page', perPage.toString());
     }
     if (sortField) {
       params = params.append('sort_field', sortField);

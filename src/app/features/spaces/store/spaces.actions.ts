@@ -75,7 +75,7 @@ export const checkAvailabilityFailure = createAction(
 // Admin: Load All Spaces
 export const loadAllSpaces = createAction(
   '[Admin/Spaces Page] Load All Spaces',
-  props<{ page?: number; sortField?: string; sortOrder?: string }>()
+  props<{ page?: number; perPage?: number; sortField?: string; sortOrder?: string }>()
 );
 
 export const loadAllSpacesSuccess = createAction(

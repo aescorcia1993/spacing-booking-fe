@@ -93,8 +93,8 @@ export class SpacesEffects {
   loadAllSpaces$ = createEffect(() =>
     this.actions$.pipe(
       ofType(SpacesActions.loadAllSpaces),
-      switchMap(({ page, sortField, sortOrder }) =>
-        this.spaceService.getAllSpaces(page, sortField, sortOrder).pipe(
+      switchMap(({ page, perPage, sortField, sortOrder }) =>
+        this.spaceService.getAllSpaces(page, perPage, sortField, sortOrder).pipe(
           map((response) => SpacesActions.loadAllSpacesSuccess({ response })),
           catchError((error) =>
             of(SpacesActions.loadAllSpacesFailure({ error: error.error?.message || 'Error al cargar espacios' }))

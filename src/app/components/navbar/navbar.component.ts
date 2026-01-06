@@ -1,4 +1,4 @@
-import { Component, inject, HostListener, ElementRef } from '@angular/core';
+import { Component, inject, HostListener, ElementRef, effect, AfterViewInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { CommonModule } from '@angular/common';
@@ -16,6 +16,9 @@ import { MenuItem } from 'primeng/api';
 import * as AuthActions from '../../features/auth/store/auth.actions';
 import * as fromAuth from '../../features/auth/store/auth.selectors';
 
+// Services
+import { NavbarService } from '../../services/navbar.service';
+
 @Component({
   selector: 'app-navbar',
   standalone: true,
@@ -28,7 +31,7 @@ import * as fromAuth from '../../features/auth/store/auth.selectors';
   ],
   template: `
     <div class="navbar-container">
-      <p-menubar [model]="menuItems()">
+      <p-menubar [model]="menuItems()" #menubar>
         <ng-template pTemplate="start">
           <div class="brand" routerLink="/">
             <div class="logo-circle">
@@ -70,6 +73,11 @@ import * as fromAuth from '../../features/auth/store/auth.selectors';
           }
         </ng-template>
       </p-menubar>
+
+      <!-- Overlay para cerrar el menú móvil -->
+      @if (showMobileMenu()) {
+        <div class="mobile-menu-overlay" (click)="closeMobileMenu()"></div>
+      }
     </div>
   `,
   styles: [`
@@ -79,6 +87,22 @@ import * as fromAuth from '../../features/auth/store/auth.selectors';
       z-index: 1000;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       background: white;
+    }
+
+    .mobile-menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
 
     .brand {
@@ -431,47 +455,149 @@ import * as fromAuth from '../../features/auth/store/auth.selectors';
       font-size: 0.875rem !important;
     }
 
-    @media (max-width: 768px) {
+    /* Tablet (769px - 1024px) */
+    @media (max-width: 1024px) and (min-width: 769px) {
+      .navbar-container {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      :host ::ng-deep .p-menubar {
+        padding: 0.625rem 1.25rem !important;
+      }
+
+      .brand {
+        font-size: 1rem;
+        gap: 0.625rem;
+      }
+
+      .logo-circle {
+        width: 2.25rem;
+        height: 2.25rem;
+      }
+
+      .logo-circle i {
+        font-size: 1.125rem;
+      }
+
+      .user-section {
+        gap: 0.625rem;
+      }
+
+      .user-name {
+        font-size: 0.75rem;
+      }
+
+      .auth-buttons {
+        gap: 0.375rem;
+      }
+
+      :host ::ng-deep .p-button {
+        padding: 0.5rem 0.875rem !important;
+        font-size: 0.75rem !important;
+      }
+    }
+
+    /* Mobile y Tablet (max-width: 1024px) - Menu hamburguesa */
+    @media (max-width: 1024px) {
+      .navbar-container {
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      }
+
+      :host ::ng-deep .p-menubar {
+        padding: 0.5rem 0.75rem !important;
+      }
+
       .brand span {
         display: none;
+      }
+
+      .brand {
+        padding: 0 0.5rem;
+      }
+
+      .logo-circle {
+        width: 2rem;
+        height: 2rem;
+      }
+
+      .logo-circle i {
+        font-size: 1rem;
       }
 
       .user-name {
         display: none;
       }
 
+      .user-section {
+        gap: 0.5rem;
+      }
+
+      .user-avatar-circle {
+        width: 2rem;
+        height: 2rem;
+        font-size: 0.75rem;
+      }
+
+      :host ::ng-deep .p-button {
+        padding: 0.5rem 0.75rem !important;
+        font-size: 0.75rem !important;
+      }
+
+      :host ::ng-deep .p-button .p-button-label {
+        display: none !important;
+      }
+
+      :host ::ng-deep .p-button .p-button-icon {
+        margin: 0 !important;
+        font-size: 1rem !important;
+      }
+
+      /* Ocultar menú por defecto en mobile/tablet */
+      :host ::ng-deep .p-menubar .p-menubar-root-list {
+        display: none !important;
+      }
+
+      /* Mostrar menú solo cuando está activo */
       :host ::ng-deep .p-menubar-mobile-active .p-menubar-root-list {
-        position: absolute !important;
-        top: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0 !important;
+        position: fixed !important;
+        top: 60px !important;
         left: 0 !important;
         right: 0 !important;
-        width: auto !important;
-        max-width: 320px !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
         height: auto !important;
+        max-height: calc(100vh - 60px) !important;
+        overflow-y: auto !important;
         background: white !important;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
-        padding: 0.75rem !important;
-        border-radius: 12px !important;
-        border: 1px solid #e5e7eb !important;
-        margin: 0.5rem 1rem !important;
-        z-index: 9999 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+        padding: 1rem !important;
+        border-radius: 0 !important;
+        border: none !important;
+        border-top: 1px solid #e5e7eb !important;
+        margin: 0 !important;
+        z-index: 1001 !important;
       }
 
       :host ::ng-deep .p-menubar-mobile-active .p-menuitem {
-        margin-bottom: 0.125rem !important;
+        margin-bottom: 0.25rem !important;
+        width: 100% !important;
       }
 
       :host ::ng-deep .p-menubar-mobile-active .p-menuitem-link {
         background: white !important;
         border: none !important;
-        border-radius: 8px !important;
-        padding: 0.875rem 1rem !important;
+        border-radius: 10px !important;
+        padding: 1rem 1.25rem !important;
         display: flex !important;
         align-items: center !important;
-        gap: 0.875rem !important;
+        gap: 1rem !important;
         transition: all 0.2s ease !important;
-        border-left: 3px solid transparent !important;
+        border-left: 4px solid transparent !important;
         position: relative !important;
+        width: 100% !important;
       }
 
       :host ::ng-deep .p-menubar-mobile-active .p-menuitem-link::before {
@@ -498,9 +624,9 @@ import * as fromAuth from '../../features/auth/store/auth.selectors';
       }
 
       :host ::ng-deep .p-menubar-mobile-active .p-menuitem-link .p-menuitem-icon {
-        font-size: 1.25rem !important;
+        font-size: 1.375rem !important;
         color: #74ACDF !important;
-        min-width: 1.25rem !important;
+        min-width: 1.5rem !important;
         transition: all 0.3s ease !important;
         z-index: 1 !important;
         position: relative !important;
@@ -512,12 +638,13 @@ import * as fromAuth from '../../features/auth/store/auth.selectors';
       }
 
       :host ::ng-deep .p-menubar-mobile-active .p-menuitem-link .p-menuitem-text {
-        font-size: 0.9375rem !important;
+        font-size: 1rem !important;
         font-weight: 600 !important;
         color: #2c3e50 !important;
         transition: all 0.2s ease !important;
         z-index: 1 !important;
         position: relative !important;
+        flex: 1 !important;
       }
 
       :host ::ng-deep .p-menubar-mobile-active .p-menuitem-link:hover .p-menuitem-text {
@@ -565,10 +692,34 @@ import * as fromAuth from '../../features/auth/store/auth.selectors';
     }
   `]
 })
-export class NavbarComponent {
+export class NavbarComponent implements AfterViewInit {
   private store = inject(Store);
   private router = inject(Router);
   private elementRef = inject(ElementRef);
+  private navbarService = inject(NavbarService);
+
+  // Usar el signal del servicio
+  showMobileMenu = this.navbarService.mobileMenuOpen;
+
+  ngAfterViewInit() {
+    // Escuchar clicks en el botón hamburguesa para actualizar el signal
+    const menubarElement = this.elementRef.nativeElement.querySelector('.p-menubar');
+    const button = menubarElement?.querySelector('.p-menubar-button') as HTMLElement;
+
+    if (button) {
+      button.addEventListener('click', () => {
+        // Esperar un momento para que PrimeNG actualice el DOM
+        setTimeout(() => {
+          const isOpen = menubarElement?.classList.contains('p-menubar-mobile-active');
+          if (isOpen) {
+            this.navbarService.openMobileMenu();
+          } else {
+            this.navbarService.closeMobileMenu();
+          }
+        }, 50);
+      });
+    }
+  }
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
@@ -606,12 +757,14 @@ export class NavbarComponent {
         icon: 'pi pi-building',
         routerLink: '/spaces',
         routerLinkActiveOptions: { exact: false },
+        command: () => this.closeMobileMenu(),
       },
       {
         label: 'Calendario',
         icon: 'pi pi-calendar',
         routerLink: '/calendar',
         routerLinkActiveOptions: { exact: false },
+        command: () => this.closeMobileMenu(),
       },
     ];
 
@@ -626,6 +779,7 @@ export class NavbarComponent {
         icon: 'pi pi-bookmark',
         routerLink: '/bookings',
         routerLinkActiveOptions: { exact: false },
+        command: () => this.closeMobileMenu(),
       },
     ];
 
@@ -636,10 +790,20 @@ export class NavbarComponent {
         icon: 'pi pi-cog',
         routerLink: '/admin/spaces',
         routerLinkActiveOptions: { exact: false },
+        command: () => this.closeMobileMenu(),
       });
     }
 
     return authenticatedItems;
+  }
+
+  closeMobileMenu() {
+    const menubarElement = this.elementRef.nativeElement.querySelector('.p-menubar');
+    if (menubarElement?.classList.contains('p-menubar-mobile-active')) {
+      const button = menubarElement.querySelector('.p-menubar-button') as HTMLElement;
+      button?.click();
+      // El signal se actualizará automáticamente por el listener en ngAfterViewInit
+    }
   }
 
   logout() {

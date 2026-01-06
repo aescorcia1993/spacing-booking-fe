@@ -292,8 +292,8 @@ import { Space, SpaceType } from '../../../models/booking.model';
                   <i class="pi pi-check-circle"></i>
                   Espacio activo
                 </label>
-                <p-toggleButton 
-                  formControlName="is_active" 
+                <p-toggleButton
+                  formControlName="is_active"
                   inputId="is_active"
                   onIcon="pi pi-check"
                   offIcon="pi pi-times"
@@ -308,8 +308,8 @@ import { Space, SpaceType } from '../../../models/booking.model';
                   <i class="pi pi-shield"></i>
                   Requiere aprobación de administrador
                 </label>
-                <p-toggleButton 
-                  formControlName="requires_approval" 
+                <p-toggleButton
+                  formControlName="requires_approval"
                   inputId="requires_approval"
                   onIcon="pi pi-lock"
                   offIcon="pi pi-lock-open"
@@ -728,24 +728,35 @@ export class SpacesAdminComponent implements OnInit {
 
   loadSpaces(event?: any) {
     console.log('📊 loadSpaces event:', event);
-    
-    const page = event ? (event.first / event.rows) + 1 : 1;
-    
+
+    // Calcular el número de página correctamente
+    // event.first es el índice del primer elemento (0-indexed)
+    // event.rows es el número de filas por página
+    const page = event?.first !== undefined && event?.rows
+      ? Math.floor(event.first / event.rows) + 1
+      : 1;
+
+    // Obtener el número de registros por página
+    const perPage = event?.rows || 10;
+
+    console.log('📄 Calculando página:', { first: event?.first, rows: event?.rows, page, perPage });
+
     // Extraer parámetros de ordenamiento del evento de PrimeNG
     let sortField: string | undefined;
     let sortOrder: string | undefined;
-    
+
     if (event?.sortField) {
       sortField = event.sortField;
       // PrimeNG usa 1 para ASC y -1 para DESC
       sortOrder = event.sortOrder === 1 ? 'asc' : 'desc';
       console.log('🔄 Ordenando por:', sortField, sortOrder);
     }
-    
-    this.store.dispatch(SpacesActions.loadAllSpaces({ 
-      page, 
-      sortField, 
-      sortOrder 
+
+    this.store.dispatch(SpacesActions.loadAllSpaces({
+      page,
+      perPage,
+      sortField,
+      sortOrder
     }));
   }
 
@@ -762,13 +773,13 @@ export class SpacesAdminComponent implements OnInit {
 
   editSpace(space: Space) {
     this.editingSpace.set(space);
-    
+
     // Extraer primera entrada de available_hours si existe
     const hoursKeys = space.available_hours ? Object.keys(space.available_hours) : [];
     const firstKey = hoursKeys.length > 0 ? hoursKeys[0] : 'monday';
     const startHour = space.available_hours?.[firstKey]?.start || '08:00';
     const endHour = space.available_hours?.[firstKey]?.end || '18:00';
-    
+
     // Construir photos string
     const photosStr = space.photos?.join(', ') || '';
 
@@ -783,7 +794,7 @@ export class SpacesAdminComponent implements OnInit {
       is_active: space.is_active,
       requires_approval: (space as any).requires_approval || false, // 🔥 Cargar valor existente
     });
-    
+
     this.spaceDialog = true;
   }
 
@@ -804,7 +815,7 @@ export class SpacesAdminComponent implements OnInit {
     this.saving.set(true);
 
     const formValue = this.spaceForm.value;
-    
+
     // Procesar available_hours - backend espera objeto con días
     const available_hours = {
       monday: {
@@ -831,7 +842,7 @@ export class SpacesAdminComponent implements OnInit {
 
     // Procesar photos
     const photosInput = formValue.photos_input?.trim() || '';
-    const photos = photosInput 
+    const photos = photosInput
       ? photosInput.split(',').map(url => url.trim()).filter(url => url.length > 0)
       : [];
 

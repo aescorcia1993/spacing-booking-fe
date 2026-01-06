@@ -95,153 +95,143 @@ body {
   --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.15);
   --shadow-xl: 0 8px 32px rgba(0, 0, 0, 0.2);
+
+  /* PrimeNG Dialog Variables - Para Confirm Dialog */
+  --p-dialog-background: #f8fafc;
+  --p-dialog-border-color: transparent;
+  --p-dialog-border-radius: 16px;
+  --p-dialog-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 1px rgba(0, 0, 0, 0.05);
+  --p-dialog-border-width: 0;
+  --p-dialog-color: #334155;
 }
 
 /* ============================================
    MODAL DE CONFIRMACIÓN PROFESIONAL
+   Solo afecta al p-confirm-dialog
    ============================================ */
 
-body .p-dialog-mask {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  background-color: rgba(0, 0, 0, 0.5) !important;
+::ng-deep body .p-dialog-mask .p-confirm-dialog.p-dialog.p-component {
+  padding: 2rem !important;
+  gap: 20px !important;
+}
+
+/* Backdrop solo para confirm dialog */
+::ng-deep body .p-dialog-mask.p-component-overlay:has(.p-confirm-dialog) {
+  background-color: rgba(0, 0, 0, 0.6) !important;
   backdrop-filter: blur(4px) !important;
-  z-index: 10000 !important;
 }
 
-body .p-dialog.p-component {
-  position: relative !important;
-  display: flex !important;
-  flex-direction: column !important;
-  max-width: 540px !important;
-  width: 90% !important;
-  background: white !important;
-  border-radius: 20px !important;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25), 0 0 1px rgba(0, 0, 0, 0.1) !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  overflow: hidden !important;
-}
-
-body .p-dialog .p-dialog-header {
-  padding: 2.5rem 2.5rem 2rem 2.5rem !important;
+::ng-deep body .p-confirm-dialog .p-dialog-header {
+  padding: 1.5rem 1.75rem !important;
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
   color: white !important;
-  border-radius: 20px 20px 0 0 !important;
+  border-radius: 16px 16px 0 0 !important;
   border-bottom: none !important;
 }
 
-body .p-dialog .p-dialog-title {
+::ng-deep body .p-confirm-dialog .p-dialog-title {
   color: white !important;
-  font-size: 1.75rem !important;
+  font-size: 1.5rem !important;
   font-weight: 700 !important;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
 }
 
-body .p-dialog .p-dialog-header-icon {
+::ng-deep body .p-confirm-dialog .p-dialog-header-icon {
   color: rgba(255, 255, 255, 0.95) !important;
   width: 2rem !important;
   height: 2rem !important;
   transition: all 0.2s ease !important;
 }
 
-body .p-dialog .p-dialog-header-icon:hover {
+::ng-deep body .p-confirm-dialog .p-dialog-header-icon:hover {
   color: white !important;
   transform: rotate(90deg) !important;
 }
 
-body .p-dialog .p-dialog-content {
-  padding: 2.5rem !important;
-  background: white !important;
+::ng-deep body .p-confirm-dialog .p-dialog-content {
+  padding: 1.75rem !important;
   display: flex !important;
   align-items: flex-start !important;
-  gap: 1.5rem !important;
+  gap: 1.25rem !important;
 }
 
-body .p-confirm-dialog-icon {
-  font-size: 3.5rem !important;
+::ng-deep body .p-confirm-dialog-icon {
+  font-size: 2.5rem !important;
   color: #ef4444 !important;
   margin: 0 !important;
-  padding: 1.25rem !important;
+  padding: 0.75rem !important;
   background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%) !important;
-  border-radius: 16px !important;
-  width: 80px !important;
-  height: 80px !important;
+  border-radius: 12px !important;
+  width: 60px !important;
+  height: 60px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   flex-shrink: 0 !important;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2) !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15) !important;
 }
 
-body .p-confirm-dialog-message {
-  font-size: 1.125rem !important;
-  color: #1e293b !important;
-  line-height: 1.7 !important;
+::ng-deep body .p-confirm-dialog-message {
+  font-size: 1rem !important;
+  color: #334155 !important;
+  line-height: 1.6 !important;
   font-weight: 500 !important;
   flex: 1 !important;
-  padding-top: 0.5rem !important;
+  padding-top: 0.25rem !important;
 }
 
-body .p-dialog .p-dialog-footer {
-  padding: 1.75rem 2.5rem 2.5rem 2.5rem !important;
-  background: linear-gradient(to bottom, transparent, #f8fafc) !important;
-  border-radius: 0 0 20px 20px !important;
+::ng-deep body .p-confirm-dialog .p-dialog-footer {
+  padding: 1.25rem 1.75rem 1.75rem 1.75rem !important;
+  border-radius: 0 0 16px 16px !important;
   border-top: 1px solid #e2e8f0 !important;
   display: flex !important;
-  gap: 1rem !important;
+  gap: 0.75rem !important;
   justify-content: flex-end !important;
 }
 
-body .p-dialog .p-dialog-footer .p-button {
-  padding: 0.875rem 2rem !important;
-  font-size: 1rem !important;
+::ng-deep body .p-confirm-dialog .p-dialog-footer .p-button {
+  padding: 0.75rem 1.5rem !important;
+  font-size: 0.95rem !important;
   font-weight: 600 !important;
-  border-radius: 12px !important;
+  border-radius: 10px !important;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  min-width: 120px !important;
+  min-width: 100px !important;
 }
 
-body .p-dialog .p-dialog-footer .p-button-danger {
+::ng-deep body .p-confirm-dialog .p-dialog-footer .p-button-danger {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
   border: none !important;
   color: white !important;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35) !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
 }
 
-body .p-dialog .p-dialog-footer .p-button-danger:hover {
+::ng-deep body .p-confirm-dialog .p-dialog-footer .p-button-danger:hover {
   background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
   transform: translateY(-2px) !important;
-  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4) !important;
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.35) !important;
 }
 
-body .p-dialog .p-dialog-footer .p-button-danger:active {
+::ng-deep body .p-confirm-dialog .p-dialog-footer .p-button-danger:active {
   transform: translateY(0) !important;
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3) !important;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25) !important;
 }
 
-body .p-dialog .p-dialog-footer .p-button-secondary {
-  background: white !important;
+::ng-deep body .p-confirm-dialog .p-dialog-footer .p-button-secondary {
+  background: #ffffff !important;
   border: 2px solid #e5e7eb !important;
   color: #6b7280 !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
 }
 
-body .p-dialog .p-dialog-footer .p-button-secondary:hover {
+::ng-deep body .p-confirm-dialog .p-dialog-footer .p-button-secondary:hover {
   background: #f9fafb !important;
   border-color: #d1d5db !important;
   color: #374151 !important;
   transform: translateY(-2px) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
 }
 
-body .p-dialog .p-dialog-footer .p-button-secondary:active {
+::ng-deep body .p-confirm-dialog .p-dialog-footer .p-button-secondary:active {
   transform: translateY(0) !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05) !important;
 }
