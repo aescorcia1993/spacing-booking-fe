@@ -1,0 +1,164 @@
+<p-dialog
+  [visible]="visible()"
+  (visibleChange)="visibleChange.emit($event)"
+  [modal]="true"
+  [style]="{width: '900px', maxWidth: '95vw'}"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <ng-template pTemplate="header">
+    <div class="dialog-header">
+      <div>
+        <h2>{{ space()?.name }}</h2>
+        <p class="space-subtitle">Calendario de Disponibilidad</p>
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="modal-content">
+    @if (loading()) {
+      <div class="loading-container">
+        <i class="pi pi-spin pi-spinner" style="font-size: 2rem;"></i>
+        <p>Cargando reservas...</p>
+      </div>
+    } @else {
+      <div class="content-grid">
+        <!-- Calendario -->
+        <div class="calendar-section">
+          <h3>Selecciona una fecha</h3>
+          <p-calendar
+            [(ngModel)]="selectedDate"
+            [inline]="true"
+            dateFormat="dd/mm/yy"
+            [showWeek]="false"
+            (onSelect)="onDateSelect($event)"
+          >
+            <ng-template pTemplate="date" let-date>
+              <span 
+                [class.date-confirmed]="hasConfirmedBooking(date.year, date.month, date.day)"
+                [class.date-pending]="hasPendingBooking(date.year, date.month, date.day)"
+                [class.date-mixed]="hasMixedBookings(date.year, date.month, date.day)"
+              >
+                {{ date.day }}
+              </span>
+            </ng-template>
+          </p-calendar>
+          
+          <div class="legend">
+            <h4>Leyenda de Estados</h4>
+            <div class="legend-items">
+              <div class="legend-item">
+                <span class="legend-dot confirmed"></span>
+                <span>Confirmada</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-dot pending"></span>
+                <span>Pendiente</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lista de Reservas -->
+        <div class="bookings-section">
+          <h3>
+            @if (selectedDate()) {
+              Reservas del {{ formatBookingDate(formatDate(selectedDate()!)) }}
+            } @else {
+              Todas las Reservas
+            }
+          </h3>
+
+          @if (filteredBookings().length === 0) {
+            <div class="empty-state">
+              <i class="pi pi-calendar" style="font-size: 3rem; color: #ccc;"></i>
+              <p>No hay reservas para mostrar</p>
+              @if (selectedDate()) {
+                <p-button
+                  label="Ver todas"
+                  icon="pi pi-times"
+                  [text]="true"
+                  (onClick)="selectedDate.set(null)"
+                />
+              }
+            </div>
+          } @else {
+            <div class="bookings-list">
+              @for (booking of filteredBookings(); track booking.id) {
+                <div class="booking-card">
+                  <div class="booking-header">
+                    <div>
+                      <h4>{{ booking.event_name }}</h4>
+                      <span class="booking-date">
+                        <i class="pi pi-calendar"></i>
+                        {{ formatBookingDate(booking.booking_date) }}
+                      </span>
+                    </div>
+                    <p-tag
+                      [value]="getStatusLabel(booking.computed_status || booking.status)"
+                      [severity]="getStatusSeverity(booking.computed_status || booking.status)"
+                    />
+                  </div>
+
+                  <div class="booking-details">
+                    <div class="detail-item">
+                      <i class="pi pi-clock"></i>
+                      <span>{{ formatTime(booking.start_time) }} - {{ formatTime(booking.end_time) }}</span>
+                      <span class="duration">({{ formatDuration(booking.duration_minutes || 0) }})</span>
+                    </div>
+
+                    @if (booking.attendees) {
+                      <div class="detail-item">
+                        <i class="pi pi-users"></i>
+                        <span>{{ booking.attendees }} asistentes</span>
+                      </div>
+                    }
+
+                    @if (booking.purpose) {
+                      <div class="detail-item">
+                        <i class="pi pi-info-circle"></i>
+                        <span>{{ booking.purpose }}</span>
+                      </div>
+                    }
+
+                    @if (booking.notes) {
+                      <div class="detail-item notes">
+                        <i class="pi pi-comment"></i>
+                        <span>{{ booking.notes }}</span>
+                      </div>
+                    }
+
+                    <div class="detail-item">
+                      <i class="pi pi-user"></i>
+                      <span>{{ booking.user?.name || 'Usuario desconocido' }}</span>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+
+            @if (selectedDate()) {
+              <div class="view-all-btn">
+                <p-button
+                  label="Ver todas las reservas"
+                  icon="pi pi-list"
+                  [text]="true"
+                  (onClick)="selectedDate.set(null)"
+                />
+              </div>
+            }
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cerrar"
+      icon="pi pi-times"
+      (onClick)="closeDialog()"
+      [text]="true"
+    />
+  </ng-template>
+</p-dialog>

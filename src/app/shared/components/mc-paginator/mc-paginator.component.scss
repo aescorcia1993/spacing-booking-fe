@@ -1,0 +1,112 @@
+/* Contenedor del paginador */
+.mc-pagination-container {
+  margin-top: 2rem;
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e0e0e0;
+}
+
+/* Información de resultados */
+.mc-pagination-info {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.mc-pagination-info strong {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+/* Estilos del paginador de PrimeNG */
+:host ::ng-deep .p-paginator {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  justify-content: center !important;
+}
+
+:host ::ng-deep .p-paginator .p-paginator-pages {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Botones de paginación */
+:host ::ng-deep .p-paginator .p-paginator-page,
+:host ::ng-deep .p-paginator .p-paginator-first,
+:host ::ng-deep .p-paginator .p-paginator-prev,
+:host ::ng-deep .p-paginator .p-paginator-next,
+:host ::ng-deep .p-paginator .p-paginator-last {
+  min-width: 2.5rem !important;
+  height: 2.5rem !important;
+  border-radius: 8px !important;
+  border: 1px solid #dee2e6 !important;
+  background: white !important;
+  color: #495057 !important;
+  margin: 0 !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Hover en botones */
+:host ::ng-deep .p-paginator .p-paginator-page:hover,
+:host ::ng-deep .p-paginator .p-paginator-first:not(.p-disabled):hover,
+:host ::ng-deep .p-paginator .p-paginator-prev:not(.p-disabled):hover,
+:host ::ng-deep .p-paginator .p-paginator-next:not(.p-disabled):hover,
+:host ::ng-deep .p-paginator .p-paginator-last:not(.p-disabled):hover {
+  background: #f8f9fa !important;
+  border-color: #74ACDF !important;
+  color: #74ACDF !important;
+}
+
+/* Página activa */
+:host ::ng-deep .p-paginator .p-paginator-page.p-paginator-page-active {
+  background: #74ACDF !important;
+  border-color: #74ACDF !important;
+  color: white !important;
+  font-weight: 600 !important;
+}
+
+/* Botones deshabilitados */
+:host ::ng-deep .p-paginator .p-disabled {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+}
+
+/* Dropdown de rows per page */
+:host ::ng-deep .p-paginator .p-dropdown {
+  border-radius: 8px !important;
+  border: 1px solid #dee2e6 !important;
+  height: 2.5rem !important;
+  margin-left: 1rem !important;
+}
+
+/* Texto de página actual */
+:host ::ng-deep .p-paginator .p-paginator-current {
+  color: #6c757d !important;
+  font-size: 0.875rem !important;
+  margin: 0 1rem !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mc-pagination-container {
+    padding: 1rem;
+  }
+
+  .mc-pagination-info {
+    font-size: 0.85rem;
+  }
+
+  :host ::ng-deep .p-paginator .p-paginator-page,
+  :host ::ng-deep .p-paginator .p-paginator-first,
+  :host ::ng-deep .p-paginator .p-paginator-prev,
+  :host ::ng-deep .p-paginator .p-paginator-next,
+  :host ::ng-deep .p-paginator .p-paginator-last {
+    min-width: 2rem !important;
+    height: 2rem !important;
+    font-size: 0.875rem !important;
+  }
+}

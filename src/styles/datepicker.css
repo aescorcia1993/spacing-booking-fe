@@ -1,0 +1,88 @@
+/* ============================================
+   DATEPICKER GLOBAL STYLES
+   ============================================ */
+
+.p-datepicker-panel {
+  background: white !important;
+  border: 1px solid #e0e0e0 !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+  border-radius: 12px !important;
+  z-index: 9999 !important;
+}
+
+.p-datepicker-header {
+  background: linear-gradient(135deg, #74ACDF 0%, #5B9BD5 100%) !important;
+  color: white !important;
+  border-radius: 12px 12px 0 0 !important;
+  padding: 1rem !important;
+  border: none !important;
+}
+
+.p-datepicker-header .p-datepicker-title {
+  color: white !important;
+  font-weight: 600 !important;
+}
+
+.p-datepicker-header button {
+  color: white !important;
+}
+
+.p-datepicker-header button:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.p-datepicker-calendar-container {
+  background: white !important;
+  padding: 0.5rem !important;
+}
+
+.p-datepicker-calendar thead th {
+  color: #495057 !important;
+  font-weight: 600 !important;
+  padding: 0.5rem !important;
+}
+
+.p-datepicker-calendar td {
+  padding: 0.25rem !important;
+}
+
+.p-datepicker-calendar td span {
+  border-radius: 6px !important;
+}
+
+.p-datepicker-calendar td:not(.p-datepicker-other-month) span:hover {
+  background: rgba(116, 172, 223, 0.1) !important;
+  color: #0033A0 !important;
+}
+
+.p-datepicker-calendar td.p-datepicker-today span {
+  background: rgba(116, 172, 223, 0.2) !important;
+  color: #0033A0 !important;
+  font-weight: 600 !important;
+}
+
+.p-datepicker-calendar td span.p-datepicker-day-selected {
+  background: linear-gradient(135deg, #74ACDF 0%, #0033A0 100%) !important;
+  color: white !important;
+}
+
+.p-timepicker {
+  background: white !important;
+  border-top: 1px solid #e0e0e0 !important;
+  padding: 1rem !important;
+}
+
+.p-timepicker button {
+  color: #74ACDF !important;
+}
+
+.p-timepicker button:hover {
+  background: rgba(116, 172, 223, 0.1) !important;
+  color: #0033A0 !important;
+}
+
+.p-datepicker-buttonbar {
+  background: white !important;
+  border-top: 1px solid #e0e0e0 !important;
+  padding: 0.75rem 1rem !important;
+}

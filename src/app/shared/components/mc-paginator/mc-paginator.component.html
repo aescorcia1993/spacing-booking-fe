@@ -1,0 +1,29 @@
+@if (pagination() && pagination()!.total > pagination()!.perPage) {
+  <div class="mc-pagination-container">
+    @if (showInfo()) {
+      <div class="mc-pagination-info">
+        <span>
+          Mostrando 
+          <strong>{{ (pagination()!.currentPage - 1) * pagination()!.perPage + 1 }}</strong>
+          -
+          <strong>{{ Math.min(pagination()!.currentPage * pagination()!.perPage, pagination()!.total) }}</strong>
+          de
+          <strong>{{ pagination()!.total }}</strong>
+          resultados
+        </span>
+      </div>
+    }
+    
+    <p-paginator
+      [rows]="pagination()!.perPage"
+      [totalRecords]="pagination()!.total"
+      [first]="(pagination()!.currentPage - 1) * pagination()!.perPage"
+      (onPageChange)="onPageChange($event)"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Página {currentPage} de {totalPages}"
+      [rowsPerPageOptions]="rowsPerPageOptions()"
+      [showPageLinks]="true"
+      [showFirstLastIcon]="true"
+    />
+  </div>
+}
