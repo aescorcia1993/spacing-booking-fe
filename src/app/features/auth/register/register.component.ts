@@ -44,7 +44,7 @@ import * as fromAuth from '../store/auth.selectors';
           <ng-template pTemplate="content">
             <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
               <h2 class="register-title">Crear Cuenta</h2>
-              
+
               <div class="field">
                 <label for="name">Nombre</label>
                 <input
@@ -393,7 +393,7 @@ export class RegisterComponent {
   passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
     const password = control.get('password')?.value;
     const confirmPassword = control.get('password_confirmation')?.value;
-    
+
     if (password && confirmPassword && password !== confirmPassword) {
       return { passwordMismatch: true };
     }
