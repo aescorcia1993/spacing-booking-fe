@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
+import { Store } from '@ngrx/store';
 import { of } from 'rxjs';
 import { map, catchError, switchMap, tap } from 'rxjs/operators';
 import { MessageService } from 'primeng/api';
@@ -17,6 +18,7 @@ export class BookingsEffects {
   private bookingService = inject(BookingService);
   private router = inject(Router);
   private messageService = inject(MessageService);
+  private store = inject(Store);
 
   /**
    * Load My Bookings Effect
@@ -26,7 +28,7 @@ export class BookingsEffects {
       ofType(BookingsActions.loadMyBookings),
       switchMap(({ filters }) =>
         this.bookingService.getMyBookings(filters).pipe(
-          map((response) => BookingsActions.loadMyBookingsSuccess({ response })),
+          map((response) => BookingsActions.loadMyBookingsSuccess({ response: response.data })),
           catchError((error) =>
             of(
               BookingsActions.loadMyBookingsFailure({
@@ -126,6 +128,8 @@ export class BookingsEffects {
             summary: 'Éxito',
             detail: message || 'Reserva creada exitosamente',
           });
+          // Recargar las reservas del usuario
+          this.store.dispatch(BookingsActions.loadMyBookings({}));
           setTimeout(() => this.router.navigate(['/bookings']), 1000);
         })
       ),

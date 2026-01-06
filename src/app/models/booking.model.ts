@@ -61,4 +61,15 @@ export interface PaginatedResponse<T> {
   last_page: number;
   per_page: number;
   total: number;
+  from?: number;
+  to?: number;
+}
+
+// Laravel nested pagination response
+export interface LaravelPaginatedResponse<T> {
+  data: PaginatedResponse<T>;
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
 }

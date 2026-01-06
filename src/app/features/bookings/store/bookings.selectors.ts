@@ -75,39 +75,57 @@ export const selectBookingsByStatus = (status: string) =>
     bookings.filter((booking) => booking.status === status)
   );
 
-// Get active bookings (confirmed and not past)
+// Get active bookings (confirmed/pending and happening right now)
 export const selectActiveBookings = createSelector(selectBookings, (bookings) => {
   const now = new Date();
+
   return bookings.filter(
     (booking) =>
-      booking.status === 'confirmed' && 
-      booking.end_datetime && 
+      (booking.status === 'confirmed' || booking.status === 'pending') &&
+      booking.start_datetime &&
+      booking.end_datetime &&
+      new Date(booking.start_datetime) <= now &&
       new Date(booking.end_datetime) >= now
+  ).sort((a, b) =>
+    new Date(a.start_datetime || a.start_time).getTime() -
+    new Date(b.start_datetime || b.start_time).getTime()
   );
 });
 
-// Get past bookings
+// Get past bookings (completed, cancelled, or already finished)
 export const selectPastBookings = createSelector(selectBookings, (bookings) => {
   const now = new Date();
-  return bookings.filter((booking) => 
-    booking.end_datetime && 
-    new Date(booking.end_datetime) < now
+  return bookings.filter((booking) => {
+    // Incluir si está cancelada o completada
+    if (booking.status === 'completed' || booking.status === 'cancelled') {
+      return true;
+    }
+    // Incluir si ya terminó (independientemente del estado)
+    if (booking.end_datetime && new Date(booking.end_datetime) < now) {
+      return true;
+    }
+    return false;
+  }).sort((a, b) =>
+    new Date(b.end_datetime || b.end_time).getTime() -
+    new Date(a.end_datetime || a.end_time).getTime()
   );
 });
 
-// Get upcoming bookings
+// Get upcoming bookings (future confirmed or pending bookings that haven't started yet)
 export const selectUpcomingBookings = createSelector(selectBookings, (bookings) => {
   const now = new Date();
+
   return bookings
     .filter(
       (booking) =>
-        booking.status === 'confirmed' && 
-        booking.start_datetime && 
+        (booking.status === 'confirmed' || booking.status === 'pending') &&
+        booking.start_datetime &&
         new Date(booking.start_datetime) > now
     )
     .sort(
       (a, b) =>
-        new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
+        new Date(a.start_datetime || a.start_time).getTime() -
+        new Date(b.start_datetime || b.start_time).getTime()
     );
 });
 

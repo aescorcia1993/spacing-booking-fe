@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Booking, PaginatedResponse } from '../models/booking.model';
+import { Booking, LaravelPaginatedResponse } from '../models/booking.model';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -15,13 +15,18 @@ export class BookingService {
    * Get user's bookings with filters
    */
   getMyBookings(filters?: {
+    type?: 'upcoming' | 'active' | 'past';
     status?: string;
     from_date?: string;
     to_date?: string;
     page?: number;
-  }): Observable<PaginatedResponse<Booking>> {
+    per_page?: number;
+  }): Observable<LaravelPaginatedResponse<Booking>> {
     let params = new HttpParams();
-    
+
+    if (filters?.type) {
+      params = params.append('type', filters.type);
+    }
     if (filters?.status) {
       params = params.append('status', filters.status);
     }
@@ -31,11 +36,14 @@ export class BookingService {
     if (filters?.to_date) {
       params = params.append('to_date', filters.to_date);
     }
-    if (filters?.page) {
+    if (filters?.page !== undefined) {
       params = params.append('page', filters.page.toString());
     }
+    if (filters?.per_page !== undefined) {
+      params = params.append('per_page', filters.per_page.toString());
+    }
 
-    return this.http.get<PaginatedResponse<Booking>>(this.apiUrl, { params });
+    return this.http.get<LaravelPaginatedResponse<Booking>>(this.apiUrl, { params });
   }
 
   /**
@@ -110,7 +118,7 @@ export class BookingService {
     endDate?: string
   ): Observable<Booking[]> {
     let params = new HttpParams();
-    
+
     if (startDate) {
       params = params.append('start_date', startDate);
     }

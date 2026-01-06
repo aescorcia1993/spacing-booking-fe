@@ -1,8 +1,9 @@
-import { Component, inject, OnInit, Signal, computed } from '@angular/core';
+import { Component, inject, OnInit, Signal, computed, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { CommonModule } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { forkJoin } from 'rxjs';
 
 // MC-Kit
 import { MCTable, MCTdTemplateDirective } from '@mckit/table';
@@ -16,18 +17,27 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TabsModule } from 'primeng/tabs';
 import { SkeletonModule } from 'primeng/skeleton';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { InputTextarea } from 'primeng/inputtextarea';
+import { CalendarModule } from 'primeng/calendar';
+import { DropdownModule } from 'primeng/dropdown';
+import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { FormsModule } from '@angular/forms';
 
 // Store
 import * as BookingsActions from '../store/bookings.actions';
 import * as fromBookings from '../store/bookings.selectors';
 import { Booking } from '../../../models/booking.model';
+import { BookingService } from '../../../services/booking.service';
 
 @Component({
   selector: 'app-bookings-list',
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     MCTable,
     MCTdTemplateDirective,
     CardModule,
@@ -37,12 +47,18 @@ import { Booking } from '../../../models/booking.model';
     ConfirmDialogModule,
     TabsModule,
     SkeletonModule,
+    DialogModule,
+    InputTextModule,
+    InputTextarea,
+    CalendarModule,
+    DropdownModule,
+    TooltipModule,
   ],
   providers: [ConfirmationService, MessageService],
   template: `
     <p-toast position="top-right" />
     <p-confirmDialog [appendTo]="'body'" [baseZIndex]="10000" />
-    
+
     <div class="bookings-list-container">
 
       <div class="header">
@@ -51,41 +67,45 @@ import { Booking } from '../../../models/booking.model';
       </div>
 
       <p-card>
-        <p-tabs [value]="0">
+        <p-tabs [(value)]="activeTab" (onChange)="onTabChange($any($event).index ?? 0)">
           <p-tablist>
             <p-tab [value]="0">
               <i class="pi pi-calendar-plus tab-icon"></i>
               Próximas
-              @if (upcomingBookings().length > 0) {
-                <span class="tab-badge">{{ upcomingBookings().length }}</span>
+              @if ((upcomingResponse().total ?? 0) > 0) {
+                <span class="tab-badge">{{ upcomingResponse().total }}</span>
               }
             </p-tab>
             <p-tab [value]="1">
               <i class="pi pi-check-circle tab-icon"></i>
               Activas
-              @if (activeBookings().length > 0) {
-                <span class="tab-badge">{{ activeBookings().length }}</span>
+              @if ((activeResponse().total ?? 0) > 0) {
+                <span class="tab-badge">{{ activeResponse().total }}</span>
               }
             </p-tab>
             <p-tab [value]="2">
               <i class="pi pi-history tab-icon"></i>
               Pasadas
-              @if (pastBookings().length > 0) {
-                <span class="tab-badge">{{ pastBookings().length }}</span>
+              @if ((pastResponse().total ?? 0) > 0) {
+                <span class="tab-badge">{{ pastResponse().total }}</span>
               }
             </p-tab>
           </p-tablist>
-          
+
           <p-tabpanels>
             <p-tabpanel [value]="0">
-              @if (loading()) {
+              @if (loading() && activeTab() === 0) {
                 <div class="skeleton-container">
                   @for (item of [1,2,3]; track item) {
                     <p-skeleton width="100%" height="80px" styleClass="mb-3" />
                   }
                 </div>
-              } @else if (upcomingBookings().length > 0) {
-                <mc-table [columns]="upcomingColumns" [response]="upcomingResponse()">
+              } @else if (upcomingResponse().data && upcomingResponse().data.length > 0) {
+                <mc-table
+                  [columns]="upcomingColumns"
+                  [response]="upcomingResponse()"
+                  [paginator]="true"
+                  (onPage)="onUpcomingPageChange($event)">
                   <!-- Template personalizado para evento -->
                   <ng-template mcTdTemplate="event_name" let-booking>
                     <strong>{{ booking.event_name }}</strong>
@@ -128,12 +148,24 @@ import { Booking } from '../../../models/booking.model';
                   <ng-template mcTdTemplate="actions" let-booking>
                     <div class="actions-cell">
                       <p-button
+                        icon="pi pi-pencil"
+                        [rounded]="true"
+                        [outlined]="true"
+                        severity="info"
+                        size="small"
+                        (onClick)="openEditDialog(booking)"
+                        pTooltip="Editar reserva"
+                        tooltipPosition="top"
+                      />
+                      <p-button
                         icon="pi pi-ban"
                         [rounded]="true"
                         [outlined]="true"
                         severity="danger"
                         size="small"
                         (onClick)="cancelBooking(booking)"
+                        pTooltip="Cancelar reserva"
+                        tooltipPosition="top"
                       />
                     </div>
                   </ng-template>
@@ -153,14 +185,18 @@ import { Booking } from '../../../models/booking.model';
             </p-tabpanel>
 
             <p-tabpanel [value]="1">
-              @if (loading()) {
+              @if (loading() && activeTab() === 1) {
               <div class="skeleton-container">
                 @for (item of [1,2,3]; track item) {
                   <p-skeleton width="100%" height="80px" styleClass="mb-3" />
                 }
               </div>
-            } @else if (activeBookings().length > 0) {
-              <mc-table [columns]="activeColumns" [response]="activeResponse()">
+            } @else if (activeResponse().data && activeResponse().data.length > 0) {
+              <mc-table
+                [columns]="activeColumns"
+                [response]="activeResponse()"
+                [paginator]="true"
+                (onPage)="onActivePageChange($event)">
                 <!-- Template personalizado para evento -->
                 <ng-template mcTdTemplate="event_name" let-booking>
                   <strong>{{ booking.event_name }}</strong>
@@ -203,12 +239,24 @@ import { Booking } from '../../../models/booking.model';
                 <ng-template mcTdTemplate="actions" let-booking>
                   <div class="actions-cell">
                     <p-button
+                      icon="pi pi-pencil"
+                      [rounded]="true"
+                      [outlined]="true"
+                      severity="info"
+                      size="small"
+                      (onClick)="openEditDialog(booking)"
+                      pTooltip="Editar reserva"
+                      tooltipPosition="top"
+                    />
+                    <p-button
                       icon="pi pi-ban"
                       [rounded]="true"
                       [outlined]="true"
                       severity="danger"
                       size="small"
                       (onClick)="cancelBooking(booking)"
+                      pTooltip="Cancelar reserva"
+                      tooltipPosition="top"
                     />
                   </div>
                 </ng-template>
@@ -223,14 +271,18 @@ import { Booking } from '../../../models/booking.model';
             </p-tabpanel>
 
             <p-tabpanel [value]="2">
-              @if (loading()) {
+              @if (loading() && activeTab() === 2) {
               <div class="skeleton-container">
                 @for (item of [1,2,3]; track item) {
                   <p-skeleton width="100%" height="80px" styleClass="mb-3" />
                 }
               </div>
-            } @else if (pastBookings().length > 0) {
-              <mc-table [columns]="pastColumns" [response]="pastResponse()">
+            } @else if (pastResponse().data && pastResponse().data.length > 0) {
+              <mc-table
+                [columns]="pastColumns"
+                [response]="pastResponse()"
+                [paginator]="true"
+                (onPage)="onPastPageChange($event)">
                 <!-- Template personalizado para evento -->
                 <ng-template mcTdTemplate="event_name" let-booking>
                   <strong>{{ booking.event_name }}</strong>
@@ -287,7 +339,7 @@ import { Booking } from '../../../models/booking.model';
           <div class="stat-content">
             <i class="pi pi-calendar-plus stat-icon upcoming"></i>
             <div>
-              <div class="stat-value">{{ upcomingBookings().length }}</div>
+              <div class="stat-value">{{ upcomingResponse().total || 0 }}</div>
               <div class="stat-label">Próximas</div>
             </div>
           </div>
@@ -297,7 +349,7 @@ import { Booking } from '../../../models/booking.model';
           <div class="stat-content">
             <i class="pi pi-check-circle stat-icon active"></i>
             <div>
-              <div class="stat-value">{{ activeBookings().length }}</div>
+              <div class="stat-value">{{ activeResponse().total || 0 }}</div>
               <div class="stat-label">Activas</div>
             </div>
           </div>
@@ -307,13 +359,140 @@ import { Booking } from '../../../models/booking.model';
           <div class="stat-content">
             <i class="pi pi-history stat-icon past"></i>
             <div>
-              <div class="stat-value">{{ pastBookings().length }}</div>
+              <div class="stat-value">{{ pastResponse().total || 0 }}</div>
               <div class="stat-label">Completadas</div>
             </div>
           </div>
         </p-card>
       </div>
     </div>
+
+    <!-- Modal de Edición -->
+    <p-dialog
+      [(visible)]="displayEditDialog"
+      [header]="'Editar Reserva'"
+      [modal]="true"
+      [style]="{ width: '90vw', maxWidth: '600px' }"
+      [draggable]="false"
+      [resizable]="false"
+      (onHide)="onDialogHide()"
+    >
+      @if (editingBooking) {
+        <div class="edit-form">
+          <div class="form-grid">
+            <!-- Nombre del Evento -->
+            <div class="form-field">
+              <label for="event_name">Nombre del Evento <span class="required">*</span></label>
+              <input
+                pInputText
+                id="event_name"
+                [(ngModel)]="editingBooking.event_name"
+                placeholder="Ej: Reunión de equipo"
+                class="w-full"
+              />
+            </div>
+
+            <!-- Fecha -->
+            <div class="form-field">
+              <label for="booking_date">Fecha <span class="required">*</span></label>
+              <p-calendar
+                [(ngModel)]="editBookingDate"
+                [showIcon]="true"
+                [minDate]="minDate"
+                dateFormat="dd/mm/yy"
+                inputId="booking_date"
+                placeholder="Seleccionar fecha"
+                styleClass="w-full"
+              />
+            </div>
+
+            <!-- Hora de inicio -->
+            <div class="form-field">
+              <label for="start_time">Hora de Inicio <span class="required">*</span></label>
+              <p-calendar
+                [(ngModel)]="editStartTime"
+                [timeOnly]="true"
+                [showIcon]="true"
+                inputId="start_time"
+                placeholder="HH:mm"
+                hourFormat="24"
+                styleClass="w-full"
+              />
+            </div>
+
+            <!-- Hora de fin -->
+            <div class="form-field">
+              <label for="end_time">Hora de Fin <span class="required">*</span></label>
+              <p-calendar
+                [(ngModel)]="editEndTime"
+                [timeOnly]="true"
+                [showIcon]="true"
+                inputId="end_time"
+                placeholder="HH:mm"
+                hourFormat="24"
+                styleClass="w-full"
+              />
+            </div>
+
+            <!-- Propósito -->
+            <div class="form-field full-width">
+              <label for="purpose">Propósito</label>
+              <input
+                pInputText
+                id="purpose"
+                [(ngModel)]="editingBooking.purpose"
+                placeholder="Motivo de la reserva"
+                class="w-full"
+              />
+            </div>
+
+            <!-- Asistentes -->
+            <div class="form-field">
+              <label for="attendees">Número de Asistentes</label>
+              <input
+                pInputText
+                type="number"
+                id="attendees"
+                [(ngModel)]="editingBooking.attendees"
+                min="1"
+                placeholder="Ej: 10"
+                class="w-full"
+              />
+            </div>
+
+            <!-- Notas -->
+            <div class="form-field full-width">
+              <label for="notes">Notas Adicionales</label>
+              <textarea
+                pInputTextarea
+                id="notes"
+                [(ngModel)]="editingBooking.notes"
+                rows="3"
+                placeholder="Notas o requerimientos especiales..."
+                class="w-full"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog-footer">
+          <p-button
+            label="Cancelar"
+            icon="pi pi-times"
+            severity="secondary"
+            [outlined]="true"
+            (onClick)="closeEditDialog()"
+          />
+          <p-button
+            label="Guardar Cambios"
+            icon="pi pi-check"
+            severity="success"
+            (onClick)="saveBookingChanges()"
+            [loading]="savingBooking"
+          />
+        </div>
+      }
+    </p-dialog>
   `,
   styles: [`
     .bookings-list-container {
@@ -347,10 +526,12 @@ import { Booking } from '../../../models/booking.model';
       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08) !important;
       border: 1px solid #e0e0e0 !important;
       background: white !important;
+      overflow: visible !important;
     }
 
     :host ::ng-deep .p-card .p-card-body {
       padding: 0 !important;
+      overflow: visible !important;
     }
 
     :host ::ng-deep .p-datatable {
@@ -359,15 +540,20 @@ import { Booking } from '../../../models/booking.model';
 
     :host ::ng-deep .p-datatable .p-datatable-wrapper {
       border-radius: 0 0 12px 12px !important;
+      overflow: visible !important;
     }
 
     :host ::ng-deep .p-tabs {
       background: transparent !important;
+      overflow: visible !important;
     }
 
     :host ::ng-deep .p-tabpanel {
       padding: 1.5rem 0 !important;
       background: transparent !important;
+      overflow: visible !important;
+      min-height: 200px !important;
+      padding-bottom: 150px !important;
     }
 
     .skeleton-container {
@@ -679,17 +865,33 @@ import { Booking } from '../../../models/booking.model';
 
     :host ::ng-deep .p-button.p-button-outlined {
       background: transparent !important;
-      border: 1.5px solid #ef4444 !important;
-      color: #ef4444 !important;
       transition: all 0.2s ease !important;
     }
 
-    :host ::ng-deep .p-button.p-button-outlined:hover {
+    :host ::ng-deep .p-button.p-button-outlined.p-button-danger {
+      border: 1.5px solid #ef4444 !important;
+      color: #ef4444 !important;
+    }
+
+    :host ::ng-deep .p-button.p-button-outlined.p-button-danger:hover {
       background: #ef4444 !important;
       color: white !important;
       border-color: #ef4444 !important;
       transform: scale(1.05) !important;
       box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25) !important;
+    }
+
+    :host ::ng-deep .p-button.p-button-outlined.p-button-info {
+      border: 1.5px solid #74ACDF !important;
+      color: #74ACDF !important;
+    }
+
+    :host ::ng-deep .p-button.p-button-outlined.p-button-info:hover {
+      background: #74ACDF !important;
+      color: white !important;
+      border-color: #74ACDF !important;
+      transform: scale(1.05) !important;
+      box-shadow: 0 4px 12px rgba(116, 172, 223, 0.25) !important;
     }
 
     :host ::ng-deep .p-button.p-button-outlined:active {
@@ -703,6 +905,8 @@ import { Booking } from '../../../models/booking.model';
       border-top: 1px solid #e0e0e0 !important;
       padding: 1rem !important;
       border-radius: 0 0 12px 12px !important;
+      position: relative !important;
+      overflow: visible !important;
     }
 
     :host ::ng-deep .p-paginator .p-paginator-pages .p-paginator-page {
@@ -774,17 +978,16 @@ import { Booking } from '../../../models/booking.model';
       border-color: #74ACDF !important;
     }
 
-    /* Forzar que el dropdown de la paginación se abra hacia arriba */
-    :host ::ng-deep .p-paginator .p-dropdown-panel {
-      transform-origin: bottom !important;
-      bottom: 100% !important;
-      top: auto !important;
-      margin-bottom: 0.5rem !important;
-    }
-
+    /* Estilos para el overlay del dropdown */
     :host ::ng-deep .p-dropdown-panel {
       border-radius: 8px !important;
-      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15) !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+      z-index: 10000 !important;
+    }
+
+    /* Asegurar que el overlay no quede cortado */
+    :host ::ng-deep .p-overlay {
+      z-index: 10000 !important;
     }
 
     :host ::ng-deep .p-dropdown:focus {
@@ -809,6 +1012,113 @@ import { Booking } from '../../../models/booking.model';
         font-size: 0.9rem;
       }
     }
+
+    /* Estilos del Modal de Edición */
+    .edit-form {
+      padding: 1rem 0;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .form-field.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .form-field label {
+      font-weight: 600;
+      color: #2c3e50;
+      font-size: 0.875rem;
+    }
+
+    .required {
+      color: #ef4444;
+      margin-left: 0.25rem;
+    }
+
+    .dialog-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    :host ::ng-deep .p-dialog .p-dialog-header {
+      background: linear-gradient(135deg, #74ACDF, #5a9dd8);
+      color: white;
+      border-radius: 12px 12px 0 0;
+      padding: 1.25rem 1.5rem;
+    }
+
+    :host ::ng-deep .p-dialog .p-dialog-header .p-dialog-title {
+      font-weight: 600;
+      font-size: 1.25rem;
+    }
+
+    :host ::ng-deep .p-dialog .p-dialog-header .p-dialog-header-icons button {
+      color: white !important;
+    }
+
+    :host ::ng-deep .p-dialog .p-dialog-header .p-dialog-header-icons button:hover {
+      background: rgba(255, 255, 255, 0.2) !important;
+    }
+
+    :host ::ng-deep .p-dialog .p-dialog-content {
+      padding: 1.5rem;
+    }
+
+    :host ::ng-deep .p-inputtext,
+    :host ::ng-deep .p-inputtextarea,
+    :host ::ng-deep .p-calendar input {
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      padding: 0.625rem 0.875rem;
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
+    }
+
+    :host ::ng-deep .p-inputtext:focus,
+    :host ::ng-deep .p-inputtextarea:focus,
+    :host ::ng-deep .p-calendar input:focus {
+      border-color: #74ACDF;
+      box-shadow: 0 0 0 3px rgba(116, 172, 223, 0.1);
+    }
+
+    :host ::ng-deep .p-calendar {
+      width: 100%;
+    }
+
+    :host ::ng-deep .p-button.p-button-success {
+      background: linear-gradient(135deg, #10b981, #059669);
+      border: none;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+
+    :host ::ng-deep .p-button.p-button-success:hover {
+      background: linear-gradient(135deg, #059669, #047857);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-field.full-width {
+        grid-column: 1;
+      }
+    }
   `]
 })
 export class BookingsListComponent implements OnInit {
@@ -816,11 +1126,30 @@ export class BookingsListComponent implements OnInit {
   private router = inject(Router);
   private confirmationService = inject(ConfirmationService);
   private messageService = inject(MessageService);
+  private bookingService = inject(BookingService);
 
-  activeBookings: Signal<Booking[]> = toSignal(this.store.select(fromBookings.selectActiveBookings), { initialValue: [] });
-  upcomingBookings: Signal<Booking[]> = toSignal(this.store.select(fromBookings.selectUpcomingBookings), { initialValue: [] });
-  pastBookings: Signal<Booking[]> = toSignal(this.store.select(fromBookings.selectPastBookings), { initialValue: [] });
-  loading: Signal<boolean> = toSignal(this.store.select(fromBookings.selectBookingsLoading), { initialValue: false });
+  // Signals - Ahora usamos las respuestas del backend directamente
+  upcomingResponse = signal<MCListResponse<Booking>>({ data: [], total: 0 });
+  activeResponse = signal<MCListResponse<Booking>>({ data: [], total: 0 });
+  pastResponse = signal<MCListResponse<Booking>>({ data: [], total: 0 });
+  loading = signal(false);
+
+  // Active tab
+  activeTab = signal(0);
+
+  perPage = 10;
+  upcomingRows = signal(10);
+  activeRows = signal(10);
+  pastRows = signal(10);
+
+  // Edit dialog properties
+  displayEditDialog = false;
+  editingBooking: Booking | null = null;
+  editBookingDate: Date | null = null;
+  editStartTime: Date | null = null;
+  editEndTime: Date | null = null;
+  savingBooking = false;
+  minDate = new Date();
 
   // MC-Table columns configuration
   upcomingColumns: MCColumn[] = [
@@ -849,28 +1178,166 @@ export class BookingsListComponent implements OnInit {
     { field: 'status', title: 'Estado' },
   ];
 
-  // Convert arrays to MCListResponse format
-  upcomingResponse = computed<MCListResponse<Booking>>(() => ({
-    data: this.upcomingBookings(),
-    total: this.upcomingBookings().length,
-  }));
-
-  activeResponse = computed<MCListResponse<Booking>>(() => ({
-    data: this.activeBookings(),
-    total: this.activeBookings().length,
-  }));
-
-  pastResponse = computed<MCListResponse<Booking>>(() => ({
-    data: this.pastBookings(),
-    total: this.pastBookings().length,
-  }));
-
   ngOnInit() {
-    this.loadBookings();
+    // Cargar las 3 peticiones en paralelo
+    this.loading.set(true);
+    forkJoin({
+      upcoming: this.bookingService.getMyBookings({ type: 'upcoming', page: 1, per_page: this.perPage }),
+      active: this.bookingService.getMyBookings({ type: 'active', page: 1, per_page: this.perPage }),
+      past: this.bookingService.getMyBookings({ type: 'past', page: 1, per_page: this.perPage })
+    }).subscribe({
+      next: ({ upcoming, active, past }) => {
+        console.log('Upcoming response:', upcoming);
+        console.log('Active response:', active);
+        console.log('Past response:', past);
+
+        this.upcomingResponse.set({
+          data: upcoming.data.data,
+          total: upcoming.data.total,
+          current_page: upcoming.data.current_page,
+          per_page: upcoming.data.per_page,
+          last_page: upcoming.data.last_page,
+          from: upcoming.data.from,
+          to: upcoming.data.to,
+        });
+        this.activeResponse.set({
+          data: active.data.data,
+          total: active.data.total,
+          current_page: active.data.current_page,
+          per_page: active.data.per_page,
+          last_page: active.data.last_page,
+          from: active.data.from,
+          to: active.data.to,
+        });
+        this.pastResponse.set({
+          data: past.data.data,
+          total: past.data.total,
+          current_page: past.data.current_page,
+          per_page: past.data.per_page,
+          last_page: past.data.last_page,
+          from: past.data.from,
+          to: past.data.to,
+        });
+
+        console.log('Upcoming set:', this.upcomingResponse());
+        console.log('Active set:', this.activeResponse());
+        console.log('Past set:', this.pastResponse());
+
+        this.loading.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading bookings:', err);
+        this.loading.set(false);
+      }
+    });
+  }
+
+  onTabChange(index: number) {
+    this.activeTab.set(index);
+  }
+
+  loadUpcomingBookings(page: number) {
+    this.loading.set(true);
+    this.bookingService.getMyBookings({ type: 'upcoming', page, per_page: this.upcomingRows() })
+      .subscribe({
+        next: (response) => {
+          this.upcomingResponse.set({
+            data: response.data.data,
+            total: response.data.total,
+            current_page: response.data.current_page,
+            per_page: response.data.per_page,
+            last_page: response.data.last_page,
+            from: response.data.from,
+            to: response.data.to,
+          });
+          this.loading.set(false);
+        },
+        error: () => {
+          this.loading.set(false);
+        }
+      });
+  }
+
+  loadActiveBookings(page: number) {
+    this.loading.set(true);
+    this.bookingService.getMyBookings({ type: 'active', page, per_page: this.activeRows() })
+      .subscribe({
+        next: (response) => {
+          this.activeResponse.set({
+            data: response.data.data,
+            total: response.data.total,
+            current_page: response.data.current_page,
+            per_page: response.data.per_page,
+            last_page: response.data.last_page,
+            from: response.data.from,
+            to: response.data.to,
+          });
+          this.loading.set(false);
+        },
+        error: () => {
+          this.loading.set(false);
+        }
+      });
+  }
+
+  loadPastBookings(page: number) {
+    this.loading.set(true);
+    this.bookingService.getMyBookings({ type: 'past', page, per_page: this.pastRows() })
+      .subscribe({
+        next: (response) => {
+          this.pastResponse.set({
+            data: response.data.data,
+            total: response.data.total,
+            current_page: response.data.current_page,
+            per_page: response.data.per_page,
+            last_page: response.data.last_page,
+            from: response.data.from,
+            to: response.data.to,
+          });
+          this.loading.set(false);
+        },
+        error: () => {
+          this.loading.set(false);
+        }
+      });
+  }
+
+  // Pagination handlers
+  onUpcomingPageChange(event: any) {
+    const page = Math.floor(event.first / event.rows) + 1;
+    const perPage = event.rows;
+    this.upcomingRows.set(perPage);
+    this.loadUpcomingBookings(page);
+  }
+
+  onActivePageChange(event: any) {
+    const page = Math.floor(event.first / event.rows) + 1;
+    const perPage = event.rows;
+    this.activeRows.set(perPage);
+    this.loadActiveBookings(page);
+  }
+
+  onPastPageChange(event: any) {
+    const page = Math.floor(event.first / event.rows) + 1;
+    const perPage = event.rows;
+    this.pastRows.set(perPage);
+    this.loadPastBookings(page);
   }
 
   loadBookings() {
-    this.store.dispatch(BookingsActions.loadMyBookings({}));
+    // Recargar el tab activo
+    const currentTab = this.activeTab();
+    switch(currentTab) {
+      case 0:
+        this.loadUpcomingBookings(1);
+        break;
+      case 1:
+        this.loadActiveBookings(1);
+        break;
+      case 2:
+        this.loadPastBookings(1);
+        break;
+    }
   }
 
   cancelBooking(booking: Booking) {
@@ -929,5 +1396,164 @@ export class BookingsListComponent implements OnInit {
       completed: 'secondary',
     };
     return severities[status] || 'info';
+  }
+
+  openEditDialog(booking: Booking) {
+    // Crear una copia del booking para editar
+    this.editingBooking = { ...booking };
+
+    // Parsear las fechas
+    if (booking.booking_date) {
+      const dateParts = booking.booking_date.split('-');
+      this.editBookingDate = new Date(
+        parseInt(dateParts[0]),
+        parseInt(dateParts[1]) - 1,
+        parseInt(dateParts[2])
+      );
+    }
+
+    // Parsear hora de inicio
+    if (booking.start_time) {
+      const startParts = booking.start_time.split(':');
+      this.editStartTime = new Date();
+      this.editStartTime.setHours(parseInt(startParts[0]), parseInt(startParts[1]), 0);
+    }
+
+    // Parsear hora de fin
+    if (booking.end_time) {
+      const endParts = booking.end_time.split(':');
+      this.editEndTime = new Date();
+      this.editEndTime.setHours(parseInt(endParts[0]), parseInt(endParts[1]), 0);
+    }
+
+    this.displayEditDialog = true;
+  }
+
+  closeEditDialog() {
+    this.displayEditDialog = false;
+    this.editingBooking = null;
+    this.editBookingDate = null;
+    this.editStartTime = null;
+    this.editEndTime = null;
+  }
+
+  onDialogHide() {
+    this.closeEditDialog();
+  }
+
+  saveBookingChanges() {
+    if (!this.editingBooking || !this.editBookingDate || !this.editStartTime || !this.editEndTime) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Por favor completa todos los campos requeridos',
+        life: 3000,
+      });
+      return;
+    }
+
+    // Validaciones del cliente
+    if (!this.editingBooking.event_name || this.editingBooking.event_name.trim() === '') {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'El nombre del evento es requerido',
+        life: 3000,
+      });
+      return;
+    }
+
+    // Validar que la hora de fin sea mayor que la hora de inicio
+    // Extraer horas y minutos para comparar correctamente
+    const startHours = this.editStartTime.getHours();
+    const startMinutes = this.editStartTime.getMinutes();
+    const endHours = this.editEndTime.getHours();
+    const endMinutes = this.editEndTime.getMinutes();
+
+    const startTotalMinutes = startHours * 60 + startMinutes;
+    const endTotalMinutes = endHours * 60 + endMinutes;
+
+    if (endTotalMinutes <= startTotalMinutes) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'La hora de fin debe ser posterior a la hora de inicio',
+        life: 3000,
+      });
+      return;
+    }
+
+    // Validar duración mínima (30 minutos)
+    const durationMinutes = endTotalMinutes - startTotalMinutes;
+    if (durationMinutes < 30) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'La duración mínima de la reserva es de 30 minutos',
+        life: 3000,
+      });
+      return;
+    }
+
+    // Validar duración máxima (8 horas)
+    if (durationMinutes > 480) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'La duración máxima de la reserva es de 8 horas',
+        life: 3000,
+      });
+      return;
+    }
+
+    this.savingBooking = true;
+
+    // Preparar los datos para enviar
+    const updatedBooking = {
+      event_name: this.editingBooking.event_name,
+      booking_date: this.formatDateForAPI(this.editBookingDate),
+      start_time: this.formatTimeForAPI(this.editStartTime),
+      end_time: this.formatTimeForAPI(this.editEndTime),
+      purpose: this.editingBooking.purpose || '',
+      attendees: this.editingBooking.attendees || 1,
+      notes: this.editingBooking.notes || '',
+    };
+
+    this.bookingService.updateBooking(this.editingBooking.id, updatedBooking).subscribe({
+      next: (response) => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Éxito',
+          detail: 'Reserva actualizada exitosamente',
+          life: 3000,
+        });
+        this.savingBooking = false;
+        this.closeEditDialog();
+        this.loadBookings();
+      },
+      error: (error) => {
+        this.savingBooking = false;
+        const errorMessage = error.error?.message || 'Error al actualizar la reserva';
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: errorMessage,
+          life: 5000,
+        });
+      },
+    });
+  }
+
+  private formatDateForAPI(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  private formatTimeForAPI(time: Date): string {
+    const hours = String(time.getHours()).padStart(2, '0');
+    const minutes = String(time.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}:00`;
   }
 }
